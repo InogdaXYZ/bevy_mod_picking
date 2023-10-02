@@ -18,7 +18,7 @@ bevy = { version = "0.11", default-features = false, features = [
     "bevy_core_pipeline",
     "bevy_render",
 ] }
-bevy_eventlistener = "0.3"
+bevy_eventlistener = { git = "https://github.com/InogdaXYZ/bevy_eventlistener.git", branch = "clonable" }
 bevy_egui = { optional = true, version = "0.21" }
 bevy_rapier3d = { optional = true, version = "0.22" }
 
