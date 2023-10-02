@@ -4,7 +4,6 @@ use bevy::{
     prelude::*,
     render::camera::NormalizedRenderTarget,
     utils::{HashMap, Uuid},
-    window::PrimaryWindow,
 };
 use std::{fmt::Debug, ops::Deref};
 
@@ -285,17 +284,8 @@ impl Location {
     ///
     /// Note this returns `false` if the location and camera have different render targets.
     #[inline]
-    pub fn is_in_viewport(
-        &self,
-        camera: &Camera,
-        primary_window: &Query<Entity, With<PrimaryWindow>>,
-    ) -> bool {
-        if camera
-            .target
-            .normalize(Some(primary_window.single()))
-            .as_ref()
-            != Some(&self.target)
-        {
+    pub fn is_in_viewport(&self, camera: &Camera, primary_window: Entity) -> bool {
+        if camera.target.normalize(Some(primary_window)).as_ref() != Some(&self.target) {
             return false;
         }
 

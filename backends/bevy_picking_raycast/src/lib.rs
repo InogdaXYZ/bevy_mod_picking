@@ -48,7 +48,7 @@ impl Plugin for RaycastBackend {
 /// Builds rays and updates raycasting [`RaycastPickCamera`]s from [`PointerLocation`]s.
 pub fn update_hits(
     pointers: Query<(&PointerId, &PointerLocation)>,
-    primary_window: Query<Entity, With<PrimaryWindow>>,
+    primary_window: Query<(Entity, &Window), With<PrimaryWindow>>,
     picking_cameras: Query<(
         Entity,
         &Camera,
@@ -70,11 +70,18 @@ pub fn update_hits(
         };
         for (cam_entity, camera, ray, cam_layers) in picking_cameras
             .iter()
-            .filter(|(_, camera, ..)| pointer_location.is_in_viewport(camera, &primary_window))
+            .filter(|(_, camera, ..)| {
+                pointer_location.is_in_viewport(camera, primary_window.single().0)
+            })
             .filter(|(.., marker, _)| marker.is_some() || !backend_settings.require_markers)
             .filter_map(|(entity, camera, transform, _, layers)| {
-                Ray3d::from_screenspace(pointer_location.position, camera, transform)
-                    .map(|ray| (entity, camera, ray, layers))
+                Ray3d::from_screenspace(
+                    pointer_location.position,
+                    camera,
+                    transform,
+                    &primary_window.single().1,
+                )
+                .map(|ray| (entity, camera, ray, layers))
             })
         {
             let settings = bevy_mod_raycast::system_param::RaycastSettings {

@@ -77,7 +77,9 @@ pub fn build_rays_from_pointers(
         };
         picking_cameras
             .iter_mut()
-            .filter(|(camera, _, _)| pointer_location.is_in_viewport(camera, &primary_window))
+            .filter(|(camera, _, _)| {
+                pointer_location.is_in_viewport(camera, primary_window.single())
+            })
             .for_each(|(camera, transform, mut source)| {
                 let mut viewport_pos = pointer_location.position;
                 if let Some(viewport) = &camera.viewport {
