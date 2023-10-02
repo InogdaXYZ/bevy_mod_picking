@@ -17,4 +17,4 @@ bevy = { version = "0.11", default-features = false, features = [
     "bevy_render",
     "bevy_asset",
 ] }
-bevy_eventlistener = "0.3"
+bevy_eventlistener = { git = "https://github.com/InogdaXYZ/bevy_eventlistener" }
