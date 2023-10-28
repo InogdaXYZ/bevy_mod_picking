@@ -23,10 +23,20 @@ fn main() {
         .run();
 }
 
-fn ui_example(mut egui_contexts: EguiContexts) {
+fn ui_example(mut egui_contexts: EguiContexts, mut number: Local<f32>) {
+    egui::SidePanel::left("Left").show(egui_contexts.ctx_mut(), |ui| {
+        ScrollArea::vertical()
+            .auto_shrink([false; 2])
+            .show(ui, |ui| {
+                ui.heading("Note that while a slider is being dragged, the panel is being resized, or the scrollbar is being moved, items in the 3d scene cannot be picked even if the mouse is over them.");
+                for _ in 0..100 {
+                    ui.add(egui::Slider::new(&mut *number, 0.0..=100.0));
+                }
+            })
+    });
     egui::Window::new("Demo").show(egui_contexts.ctx_mut(), |ui| {
         ScrollArea::both().auto_shrink([false; 2]).show(ui, |ui| {
-            ui.heading("Note that you can select a 3d object then click on the egui window without that object being deselected!");
+            ui.heading("Note that you can select a 3d object then click on this egui window without that object being deselected!");
         });
     });
 }
@@ -43,7 +53,7 @@ fn setup(
             material: materials.add(Color::WHITE.into()),
             ..Default::default()
         },
-        PickableBundle::default(), // <- Makes the mesh pickable.
+        PickableBundle::default(),
     ));
     commands.spawn((
         PbrBundle {
@@ -52,7 +62,7 @@ fn setup(
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..Default::default()
         },
-        PickableBundle::default(), // <- Makes the mesh pickable.
+        PickableBundle::default(),
     ));
     commands.spawn(PointLightBundle {
         point_light: PointLight {

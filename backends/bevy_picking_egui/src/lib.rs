@@ -10,7 +10,7 @@ use bevy_ecs::prelude::*;
 use bevy_reflect::prelude::*;
 use bevy_render::camera::NormalizedRenderTarget;
 
-use bevy_egui::{EguiContext, EguiSet};
+use bevy_egui::EguiContext;
 use bevy_picking_core::backend::prelude::*;
 
 /// Commonly used imports for the [`bevy_picking_egui`](crate) crate.
@@ -25,10 +25,8 @@ pub struct EguiBackend;
 impl Plugin for EguiBackend {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            PreUpdate,
-            egui_picking
-                .in_set(PickSet::Backend)
-                .after(EguiSet::BeginFrame),
+            PostUpdate, // This is important. If the system is put into the picking set in PreUpdate, the egui frame will not have been constructed, and the backend will not report egui hits, because the user doesn't build egui until the Update schedule. The downside to this is that the backend will always be one frame out of date. The only way to solve this is to do all of your egui work in PreUpdate before the picking backend set, then change this system to run in the picking set.
+            egui_picking,
         )
         .insert_resource(EguiBackendSettings::default());
 
@@ -82,7 +80,7 @@ pub fn egui_picking(
     {
         if let NormalizedRenderTarget::Window(id) = location.target {
             if let Ok((entity, mut ctx)) = egui_context.get_mut(id.entity()) {
-                if ctx.get_mut().is_pointer_over_area() {
+                if ctx.get_mut().wants_pointer_input() {
                     let entry = (entity, HitData::new(entity, 0.0, None, None));
                     let order = 1_000_000f32; // Assume egui should be on top of everything else.
                     output.send(PointerHits::new(*pointer, Vec::from([entry]), order))
