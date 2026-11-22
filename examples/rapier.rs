@@ -62,6 +62,14 @@ fn setup(
     commands.spawn((
         Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+            camera: Camera {
+                viewport: Some(bevy::render::camera::Viewport {
+                    physical_position: UVec2::new(500, 200),
+                    physical_size: UVec2::new(400, 400),
+                    ..default()
+                }),
+                ..Default::default()
+            },
             ..Default::default()
         },
         RapierPickCamera::default(), // <- Sets the camera to use for picking.
